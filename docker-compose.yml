@@ -1,0 +1,29 @@
+# Local / VPS deployment.
+#   docker compose up -d --build                     # bot + SQLite file in ./data
+#   docker compose --profile postgres up -d --build  # bot + PostgreSQL (set DATABASE_URL below in .env)
+services:
+  bot:
+    build: .
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data        # keeps the SQLite file between restarts (ignored when using PostgreSQL)
+    # Webhook mode only: publish the port and put an HTTPS reverse proxy in front.
+    # ports: ["8080:8080"]
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: superai
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env to use the postgres profile}
+      POSTGRES_DB: superai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+# With the postgres profile set in .env:
+#   POSTGRES_PASSWORD=<long random value>
+#   DATABASE_URL=postgresql://superai:<same password>@postgres:5432/superai

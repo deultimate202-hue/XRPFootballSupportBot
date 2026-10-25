@@ -1,0 +1,4 @@
+# Runtime dependencies. Version ranges are conservative; pin exact versions after your first successful deploy.
+python-telegram-bot[webhooks]>=21.6,<23
+psycopg[binary,pool]>=3.1,<4      # only used when DATABASE_URL points to PostgreSQL
+python-dotenv>=1.0                # optional: loads a local .env file during development
